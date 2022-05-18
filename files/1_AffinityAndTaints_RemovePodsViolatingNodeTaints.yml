@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taints-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: taints-app
+  template:
+    metadata:
+      name: taints-app
+      labels:
+        app: taints-app
+    spec:
+      containers:
+      - name: taints-app
+        image: docker.io/ibmcom/pause-ppc64le:3.1
+        imagePullPolicy: IfNotPresent
+    tolerations:
+      - key: "key1"
+        operator: "Equal"
+        value: "value1"
+        effect: "NoSchedule"
+    restartPolicy: Always

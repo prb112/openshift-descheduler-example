@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: evict-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  mountOptions: 
+    - nfsvers=4.2
+  nfs:
+    path: /
+    server: 192.168.0.92
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: evict-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeName: evict-pv
+  resources:
+    requests:
+      storage: 1Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lifetime-store
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lifetime-store
+  template:
+    metadata:
+      name: lifetime-store
+      labels:
+        app: lifetime-store
+    spec:
+      containers:
+      - name: lifetime-store
+        image: docker.io/ibmcom/pause-ppc64le:3.1
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: "/test" 
+            name: nfs 
+      volumes:
+      - name: nfs
+        persistentVolumeClaim:
+          claimName: evict-pvc 
+      restartPolicy: Always

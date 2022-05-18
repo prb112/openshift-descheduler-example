@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: ua
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ua
+  template:
+    metadata:
+      name: ua
+      labels:
+        app: ua
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - a
+      containers:
+      - name: ua
+        image: docker.io/ibmcom/pause-ppc64le:3.1
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always

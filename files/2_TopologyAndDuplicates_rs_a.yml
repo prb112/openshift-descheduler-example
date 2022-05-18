@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: ua
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ua
+  template:
+    metadata:
+      name: ua
+      labels:
+        app: ua
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: ua
+      containers:
+      - name: ua
+        image: docker.io/ibmcom/pause-ppc64le:3.1
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always

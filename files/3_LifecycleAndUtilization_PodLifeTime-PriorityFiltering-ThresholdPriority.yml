@@ -1,0 +1,23 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: thresholdpriority
+value: 1000
+globalDefault: false
+---
+apiVersion: operator.openshift.io/v1
+kind: KubeDescheduler
+metadata:
+  name: cluster
+  namespace: openshift-kube-descheduler-operator
+spec:
+  logLevel: TraceAll
+  mode: Automatic
+  operatorLogLevel: Normal
+  deschedulingIntervalSeconds: 60
+  profileCustomizations:
+    thresholdPriorityClassName: thresholdpriority
+    podLifetime: '3m'
+  profiles:
+    - LifecycleAndUtilization
+  managementState: Managed

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unbalanced
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: unbalanced
+  template:
+    metadata:
+      name: unbalanced
+      labels:
+        app: unbalanced
+    spec:
+      containers:
+      - name: unbalanced
+        image: docker.io/ibmcom/pause-ppc64le:3.1
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+      restartPolicy: Always

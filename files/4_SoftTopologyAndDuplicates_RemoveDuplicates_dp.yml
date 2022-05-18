@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: unbalanced
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: unbalanced
+  template:
+    metadata:
+      name: unbalanced
+      labels:
+        app: unbalanced
+    spec:
+      containers:
+      - name: unbalanced
+        image: docker.io/ibmcom/pause-ppc64le:3.1
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always

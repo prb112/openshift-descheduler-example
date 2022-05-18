@@ -1,0 +1,87 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: lowpriority
+value: 95
+globalDefault: false
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: highpriority
+value: 1000
+globalDefault: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: 
+    "descheduler.alpha.kubernetes.io/evict": "true"
+  name: system-cluster-critical-priority
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: system-cluster-critical-priority
+  template:
+    metadata:
+      name: system-cluster-critical-priority
+      labels:
+        app: system-cluster-critical-priority
+    spec:
+      containers:
+      - name: high-priority
+        image: docker.io/ibmcom/pause-ppc64le:3.1
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      # you can switch these around to 'test the system-cluster-critical'
+      #priority: 10000
+      priorityClassName: system-cluster-critical
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: 
+    "descheduler.alpha.kubernetes.io/evict": "true"
+  name: high-priority
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: high-priority
+  template:
+    metadata:
+      name: high-priority
+      labels:
+        app: high-priority
+    spec:
+      containers:
+      - name: high-priority
+        image: docker.io/ibmcom/pause-ppc64le:3.1
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      priorityClassName: highpriority
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: 
+    "descheduler.alpha.kubernetes.io/evict": "true"
+  name: low-priority
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: low-priority
+  template:
+    metadata:
+      name: low-priority
+      labels:
+        app: low-priority
+    spec:
+      containers:
+      - name: low-priority
+        image: docker.io/ibmcom/pause-ppc64le:3.1
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      priorityClassName: lowpriority
